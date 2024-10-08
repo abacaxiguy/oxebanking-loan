@@ -1,6 +1,6 @@
-(ns clojure-api-example.core-test
+(ns oxebanking-loan.core-test
   (:require [clojure.test :refer :all]
-            [clojure-api-example.core :refer :all]))
+            [oxebanking-loan.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

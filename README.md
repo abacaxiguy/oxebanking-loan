@@ -1,4 +1,4 @@
-# clojure-api-example
+# oxebanking-loan
 
 FIXME: description
 
@@ -10,7 +10,7 @@ Download from http://example.com/FIXME.
 
 FIXME: explanation
 
-    $ java -jar clojure-api-example-0.1.0-standalone.jar [args]
+    $ java -jar oxebanking-loan-0.1.0-standalone.jar [args]
 
 ## Options
 
