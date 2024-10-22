@@ -1,0 +1,188 @@
+## Loans Request
+
+
+[POST] - /loans/request
+
+Body:
+
+{
+    "customerId":123,  
+    "requestedValue":10000.00,
+    "termInMonths":24
+}
+
+Response:
+
+{
+    "id":1,
+    "customerId":123,
+    "requestedValue":10000.00,
+    "termInMonths":24,
+    "status": false,
+    "createdAt": "2024-10-10",
+    "updatedAt": "2024-10-10"
+}
+
+
+[GET] - /loans/request
+
+Response:
+
+[
+    {  
+        "id":1,
+        "customerId":123,
+        "requestedValue":10000.00,
+        "termInMonths":24,
+        "status": false,
+        "createdAt": "2024-10-10",
+        "updatedAt": "2024-10-10"
+    }
+]
+
+
+[GET] - /loans/request/:id
+
+Response:
+
+{
+    "id":1,
+    "customerId":123,
+    "requestedValue":10000.00,
+    "termInMonths":24,
+    "status": false,
+    "approvedAt": null,
+    "createdAt": "2024-10-10",
+    "updatedAt": "2024-10-10"
+}
+
+
+[PUT] - /loans/request/:id
+
+Body:
+
+{
+    "status": true,
+    "approvedAt": "2024-10-11"
+}
+
+Response:
+
+{
+    "id":1,
+    "status": true,
+    "approvedAt": "2024-10-11",
+    "updatedAt": "2024-10-11"
+}
+
+
+## Loans
+
+
+[POST] - /loans/
+
+Body:
+
+{
+    "requestId":1,
+    "customerId":123,
+    "approvedValue":9500.00,
+    "interestRate":5.5,
+    "installmentValue":400.00
+}
+
+Response:
+
+{
+    "id":1,
+    "requestId":1,
+    "customerId":123,
+    "approvedValue":9500.00,
+    "interestRate":5.5,
+    "installmentValue":400.00,
+    "status": true,
+    "createdAt": "2024-10-11",
+    "updatedAt": "2024-10-11"
+}
+
+
+[GET] - /loans/
+
+Response:
+
+[
+    {
+        "id":1,
+        "customerId":123,
+        "approvedValue":9500.00,
+        "installmentValue":400.00,
+        "status": true,
+        "createdAt": "2024-10-11",
+        "updatedAt": "2024-10-11"
+    }
+]
+
+
+[GET] - /loans/:id
+
+Response:
+
+{
+    "id":1,
+    "customerId":123,
+    "approvedValue":9500.00,
+    "installmentValue":400.00,
+    "interestRate":5.5,
+    "status": true,
+    "createdAt": "2024-10-11",
+    "updatedAt": "2024-10-11"
+}
+
+
+## Loans Payments
+
+
+[POST] - /loans/:id/payments
+
+Body:
+{
+    "paidValue":400.00,
+    "latePenalty":0.00,
+    "fee":5.00,
+    "dueDate": "2024-11-10",
+    "paymentDate": "2024-11-05"
+}
+
+Response:
+
+{
+    "id":1,
+    "loanId":1,
+    "paidValue":400.00,
+    "latePenalty":0.00,
+    "fee":5.00,
+    "dueDate": "2024-11-10",
+    "paymentDate": "2024-11-05",
+    "status": true,
+    "createdAt": "2024-11-05",
+    "updatedAt": "2024-11-05"
+}
+
+[GET] - /loans/:id/payments
+
+Response:
+
+[
+    {
+        "id":1,
+        "loanId":1,
+        "paidValue":400.00,
+        "latePenalty":0.00,
+        "fee":5.00,
+        "dueDate": "2024-11-10",
+        "paymentDate": "2024-11-05",
+        "status": true,
+        "createdAt": "2024-11-05",
+        "updatedAt": "2024-11-05"
+    }
+]
