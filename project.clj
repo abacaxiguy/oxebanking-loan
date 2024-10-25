@@ -3,6 +3,7 @@
                  [ring "1.9.6"]
                  [compojure "1.7.0"]
                  [cheshire "5.10.0"]
+                 [org.clojure/core.async "1.5.648"]
                  [com.github.seancorfield/next.jdbc "1.3.847"]
                  [org.postgresql/postgresql "42.3.3"]]
   :main oxebanking-loan.core)

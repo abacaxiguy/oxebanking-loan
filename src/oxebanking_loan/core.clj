@@ -5,7 +5,9 @@
             [compojure.core :refer [defroutes GET POST PUT DELETE]]
             [compojure.route :as route]
             [next.jdbc :as jdbc]
-            [next.jdbc.sql :as sql])
+            [next.jdbc.sql :as sql]
+            [clojure.java.io :as io]
+            [clojure.core.async :as async :refer [go timeout <!]])
   (:gen-class))
 
 (def db-spec {:dbtype "postgresql"
@@ -55,13 +57,30 @@
 (defn get-loan-payments [loan-id]
   (sql/query datasource ["SELECT * FROM loanPayments WHERE loanId = ?" loan-id]))
 
+;; Helper function to randomize the approval time (max 10 minutes)
+(defn random-delay []
+  (rand-int (* 10 60 1000))) ;; max 10 min in milliseconds
+
+;; Background task to mimic loan approval
+(defn approve-loan [loan-request]
+  (future
+    (Thread/sleep (random-delay)) ;; Simulate the approval delay
+    (let [loan {:customerId (:customerId loan-request)
+                :amount (:amount loan-request)
+                :status "approved"}]
+      (create-loan loan)
+      (println "Loan approved and created:" loan))))
+
 (defroutes app-routes
+  (GET "/" []
+    (json-response {:message "Welcome to the Oxebanking Loan API"}))
 
   ;; Loan Requests
   (POST "/loans/request" {body :body}
     (let [loan-data (json/parse-string (slurp body) true)
           result (create-loan-request loan-data)]
-      (json-response {:result result} 201)))
+      (approve-loan loan-data) ;; Start background loan approval process
+      (json-response {:result result :message "Loan request received. Processing approval."} 201)))
 
   (GET "/loans/request" []
     (let [requests (get-loan-requests)]
@@ -84,11 +103,6 @@
     (json-response {:message "Loan request deleted"}))
 
   ;; Loans
-  (POST "/loans" {body :body}
-    (let [loan-data (json/parse-string (slurp body) true)
-          result (create-loan loan-data)]
-      (json-response {:result result} 201)))
-
   (GET "/loans" []
     (let [loans (get-loans)]
       (json-response {:loans loans})))
