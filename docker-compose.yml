@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: oxebanking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./db/database.sql:/docker-entrypoint-initdb.d/database.sql
+
+  app:
+    build:
+      context: .
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: oxebanking
+      DB_USER: postgres
+      DB_PASSWORD: root
+    ports:
+      - "3000:3000"
+
+volumes:
+  db_data:

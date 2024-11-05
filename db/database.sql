@@ -1,37 +1,35 @@
 CREATE TABLE loanRequests (
-  id INT PRIMARY KEY,
-  customerId INT,
-  requestedValue DECIMAL(10,2),
+  id SERIAL PRIMARY KEY,
+  customerId INT NOT NULL,
+  requestedValue DECIMAL(10,2) NOT NULL,
   termInMonths INT,
-  status BOOLEAN,
+  status VARCHAR(255) DEFAULT 'pending',
   approvedAt DATE,
-  createdAt DATE,
-  updatedAt DATE
+  createdAt DATE NOT NULL DEFAULT CURRENT_DATE,
+  updatedAt DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE loans (
-  id INT PRIMARY KEY,
-  requestId INT,
-  customerId INT,
-  approvedValue DECIMAL(10,2),
+  id SERIAL PRIMARY KEY,
+  requestId INT NOT NULL,
+  customerId INT NOT NULL,
+  approvedValue DECIMAL(10,2) NOT NULL,
   interestRate FLOAT,
   installmentValue DECIMAL(10,2),
-  status BOOLEAN,
-  createdAt DATE,
-  updatedAt DATE,
+  createdAt DATE NOT NULL DEFAULT CURRENT_DATE,
+  updatedAt DATE NOT NULL DEFAULT CURRENT_DATE,
   FOREIGN KEY (requestId) REFERENCES loanRequests(id)
 );
 
 CREATE TABLE loanPayments (
-  id INT PRIMARY KEY,
-  loanId INT,
-  paidValue DECIMAL(10,2),
-  latePenalty DECIMAL(10,2),
-  fee DECIMAL(10,2),
-  dueDate DATE,
+  id SERIAL PRIMARY KEY,
+  loanId INT NOT NULL,
+  paidValue DECIMAL(10,2) NOT NULL,
+  latePenalty DECIMAL(10,2) DEFAULT 0.00,
+  dueDate DATE NOT NULL,
   paymentDate DATE,
-  status BOOLEAN,
-  createdAt DATE,
-  updatedAt DATE,
+  status BOOLEAN DEFAULT FALSE,
+  createdAt DATE NOT NULL DEFAULT CURRENT_DATE,
+  updatedAt DATE NOT NULL DEFAULT CURRENT_DATE,
   FOREIGN KEY (loanId) REFERENCES loans(id)
 );

@@ -6,18 +6,18 @@
 Body:
 
 {
-    "customerId":123,  
-    "requestedValue":10000.00,
-    "termInMonths":24
+    "customerId": 123,
+    "requestedValue": 10000.00,
+    "termInMonths": 24
 }
 
 Response:
 
 {
-    "id":1,
-    "customerId":123,
-    "requestedValue":10000.00,
-    "termInMonths":24,
+    "id": 1,
+    "customerId": 123,
+    "requestedValue": 10000.00,
+    "termInMonths": 24,
     "status": false,
     "createdAt": "2024-10-10",
     "updatedAt": "2024-10-10"
@@ -30,10 +30,10 @@ Response:
 
 [
     {  
-        "id":1,
-        "customerId":123,
-        "requestedValue":10000.00,
-        "termInMonths":24,
+        "id": 1,
+        "customerId": 123,
+        "requestedValue": 10000.00,
+        "termInMonths": 24,
         "status": false,
         "createdAt": "2024-10-10",
         "updatedAt": "2024-10-10"
@@ -46,10 +46,10 @@ Response:
 Response:
 
 {
-    "id":1,
-    "customerId":123,
-    "requestedValue":10000.00,
-    "termInMonths":24,
+    "id": 1,
+    "customerId": 123,
+    "requestedValue": 10000.00,
+    "termInMonths": 24,
     "status": false,
     "approvedAt": null,
     "createdAt": "2024-10-10",
@@ -69,7 +69,7 @@ Body:
 Response:
 
 {
-    "id":1,
+    "id": 1,
     "status": true,
     "approvedAt": "2024-10-11",
     "updatedAt": "2024-10-11"
@@ -84,22 +84,22 @@ Response:
 Body:
 
 {
-    "requestId":1,
-    "customerId":123,
-    "approvedValue":9500.00,
-    "interestRate":5.5,
-    "installmentValue":400.00
+    "requestId": 1,
+    "customerId": 123,
+    "approvedValue": 9500.00,
+    "interestRate": 5.5,
+    "installmentValue": 400.00
 }
 
 Response:
 
 {
-    "id":1,
-    "requestId":1,
-    "customerId":123,
-    "approvedValue":9500.00,
-    "interestRate":5.5,
-    "installmentValue":400.00,
+    "id": 1,
+    "requestId": 1,
+    "customerId": 123,
+    "approvedValue": 9500.00,
+    "interestRate": 5.5,
+    "installmentValue": 400.00,
     "status": true,
     "createdAt": "2024-10-11",
     "updatedAt": "2024-10-11"
@@ -112,10 +112,10 @@ Response:
 
 [
     {
-        "id":1,
-        "customerId":123,
-        "approvedValue":9500.00,
-        "installmentValue":400.00,
+        "id": 1,
+        "customerId": 123,
+        "approvedValue": 9500.00,
+        "installmentValue": 400.00,
         "status": true,
         "createdAt": "2024-10-11",
         "updatedAt": "2024-10-11"
@@ -128,11 +128,11 @@ Response:
 Response:
 
 {
-    "id":1,
-    "customerId":123,
-    "approvedValue":9500.00,
-    "installmentValue":400.00,
-    "interestRate":5.5,
+    "id": 1,
+    "customerId": 123,
+    "approvedValue": 9500.00,
+    "installmentValue": 400.00,
+    "interestRate": 5.5,
     "status": true,
     "createdAt": "2024-10-11",
     "updatedAt": "2024-10-11"
@@ -145,22 +145,19 @@ Response:
 [POST] - /loans/:id/payments
 
 Body:
+
 {
-    "paidValue":400.00,
-    "latePenalty":0.00,
-    "fee":5.00,
-    "dueDate": "2024-11-10",
-    "paymentDate": "2024-11-05"
+    "id": 1
 }
 
 Response:
 
 {
-    "id":1,
-    "loanId":1,
-    "paidValue":400.00,
-    "latePenalty":0.00,
-    "fee":5.00,
+    "id": 1,
+    "loanId": 1,
+    "paidValue": 400.00,
+    "latePenalty": 0.00,
+    "fee": 5.00,
     "dueDate": "2024-11-10",
     "paymentDate": "2024-11-05",
     "status": true,
@@ -174,11 +171,11 @@ Response:
 
 [
     {
-        "id":1,
-        "loanId":1,
-        "paidValue":400.00,
-        "latePenalty":0.00,
-        "fee":5.00,
+        "id": 1,
+        "loanId": 1,
+        "paidValue": 400.00,
+        "latePenalty": 0.00,
+        "fee": 5.00,
         "dueDate": "2024-11-10",
         "paymentDate": "2024-11-05",
         "status": true,

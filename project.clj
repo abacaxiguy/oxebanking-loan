@@ -6,4 +6,5 @@
                  [org.clojure/core.async "1.5.648"]
                  [com.github.seancorfield/next.jdbc "1.3.847"]
                  [org.postgresql/postgresql "42.3.3"]]
-  :main oxebanking-loan.core)
+  :main oxebanking-loan.core
+  :uberjar-name "oxebanking-loan.jar")
