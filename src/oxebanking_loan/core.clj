@@ -4,6 +4,7 @@
             [cheshire.core :as json]
             [compojure.core :refer [defroutes GET POST PUT DELETE]]
             [compojure.route :as route]
+            [compojure.handler :as handler]
             [next.jdbc :as jdbc]
             [next.jdbc.sql :as sql]
             [clojure.java.io :as io]
@@ -27,10 +28,10 @@
 
 ;; Utilitários
 (defn random-delay []
-  (+ 1000 (rand-int (* 10 60)))) ;; random delay between 1 second and 1 minute
+  (+ (* 60 1000) (rand-int (* 4 60 1000)))) ;; random delay between 1 and 5 minutes
 
 (defn random-decision []
-  (if (< (rand) 0.9) "approved" "rejected")) ;; 50% chance for either outcome
+  (if (< (rand) 0.5) "approved" "rejected")) ;; 50% chance for either outcome
 
 (defn random-interest-rate []
   (+ 10 (rand-int 10))) ;; random interest rate between 10% and 20%
@@ -53,22 +54,27 @@
 (defn create-loan-request [loan-data]
   (sql/insert! datasource :loanRequests (assoc loan-data :status "pending")))
 
-(defn get-loan-requests []
-  (sql/query datasource ["SELECT * FROM loanRequests"]))
+(defn get-loan-requests [customer-id]
+  (sql/query datasource ["SELECT * FROM loanRequests WHERE customerid = ?::integer" customer-id]))
 
 (defn get-loan-request [id]
   (sql/get-by-id datasource :loanRequests id))
 
 (defn delete-loan-request [id]
-  (sql/delete! datasource :loanRequests {:id id}))
+  (let [request (get-loan-request id)]
+    (if (and request (contains? #{"pending" "rejected"} (:loanrequests/status request)))
+      (do
+        (sql/delete! datasource :loanRequests {:id id})
+        true)
+      false)))
 
 
 ;; Loans
 (defn create-loan [loan-data]
   (sql/insert! datasource :loans loan-data))
 
-(defn get-loans []
-  (sql/query datasource ["SELECT * FROM loans"]))
+(defn get-loans [customer-id]
+  (sql/query datasource ["SELECT * FROM loans WHERE customerid = ?::integer" customer-id]))
 
 (defn get-loan [id]
   (sql/get-by-id datasource :loans id))
@@ -79,7 +85,7 @@
   (sql/insert! datasource :loanPayments payment-data))
 
 (defn get-loan-payments [loan-id]
-  (sql/query datasource ["SELECT * FROM loanPayments WHERE loanId = ?" loan-id]))
+  (sql/query datasource ["SELECT * FROM loanPayments WHERE loanid = ?" loan-id]))
 
 
 ;; Cria as faturas para o empréstimo de acordo com a quantidade de parcelas
@@ -122,7 +128,6 @@
   (future
     (Thread/sleep (random-delay))
     (let [status (random-decision)]
-      (println "Loan request processed:" (:loanrequests/id loan-request) "Status:" status)
       (let [update-data (if (= status "approved")
                          (assoc {:status status} :approvedAt (java.time.LocalDateTime/now))
                     {:status status})]
@@ -135,42 +140,83 @@
   (GET "/" []
     (json-response {:message "Welcome to the Oxebanking Loan API"}))
 
+
   ;; Loan Requests
   (POST "/loans/request" {body :body}
     (let [loan-data (json/parse-string (slurp body) true)
           result (create-loan-request loan-data)]
-      (println "🚀🚀 Received loan request, id:" (:loanrequests/id result))
       (process-loan-request result)
-      (json-response {:result result :message "Pedido recebido e em processamento."})))
+      (json-response {:id (:loanrequests/id result)
+                      :customerId (:loanrequests/customerid loan-data)
+                      :requestedValue (:loanrequests/requestedvalue loan-data)
+                      :termInMonths (:loanrequests/terminmonths loan-data)
+                      :status (:loanrequests/status loan-data)
+                      :approvedAt (:loanrequests/approvedat loan-data)
+                      :createdAt (:loanrequests/createdat loan-data)
+                      :updatedAt (:loanrequests/updatedat loan-data)})))
 
-  (GET "/loans/request" []
-    (let [requests (get-loan-requests)]
-      (json-response {:requests requests})))
-
+  (GET "/loans/request" {params :params}
+    (let [customer-id (:customerId params)
+          loan-requests (get-loan-requests customer-id)]
+      (json-response (map #(hash-map :id (:loanrequests/id %)
+                                     :customerId (:loanrequests/customerid %)
+                                     :requestedValue (:loanrequests/requestedvalue %)
+                                     :termInMonths (:loanrequests/terminmonths %)
+                                     :status (:loanrequests/status %)
+                                     :approvedAt (:loanrequests/approvedat %)
+                                     :createdAt (:loanrequests/createdat %)
+                                     :updatedAt (:loanrequests/updatedat %))
+                                 loan-requests))))
+      
   (GET "/loans/request/:id" [id]
     (let [request (get-loan-request (Integer/parseInt id))]
       (if request
-        (json-response request)
+        (json-response {:id (:loanrequests/id request)
+                        :customerId (:loanrequests/customerid request)
+                        :requestedValue (:loanrequests/requestedvalue request)
+                        :termInMonths (:loanrequests/terminmonths request)
+                        :status (:loanrequests/status request)
+                        :approvedAt (:loanrequests/approvedat request)
+                        :createdAt (:loanrequests/createdat request)
+                        :updatedAt (:loanrequests/updatedat request)})
         (json-response {:error "Loan request not found"} 404))))
 
   (DELETE "/loans/request/:id" [id]
-    (delete-loan-request (Integer/parseInt id))
-    (json-response {:message "Loan request deleted"}))
+    (if (delete-loan-request (Integer/parseInt id))
+      (json-response {:message "Loan request deleted"})
+      (json-response {:error "Cannot delete loan request - not found or already approved"} 400)))
+
 
   ;; Loans
-  (GET "/loans" []
-    (let [loans (get-loans)]
-      (json-response {:loans loans})))
+  (GET "/loans" {params :params}
+    (let [customer-id (:customerId params)
+          loans (get-loans customer-id)]
+      (json-response (map #(hash-map :id (:loans/id %)
+                                     :requestId (:loans/requestid %)
+                                     :customerId (:loans/customerid %)
+                                     :approvedValue (:loans/approvedvalue %)
+                                     :interestRate (:loans/interestrate %)
+                                     :installmentValue (:loans/installmentvalue %)
+                                     :createdAt (:loans/createdat %)
+                                     :updatedAt (:loans/updatedat %))
+                                 loans))))
 
   (GET "/loans/:id" [id]
     (let [loan (get-loan (Integer/parseInt id))]
       (if loan
-        (json-response loan)
+        (json-response {:id (:loans/id loan)
+                        :requestId (:loans/requestid loan)
+                        :customerId (:loans/customerid loan)
+                        :approvedValue (:loans/approvedvalue loan)
+                        :interestRate (:loans/interestrate loan)
+                        :installmentValue (:loans/installmentvalue loan)
+                        :createdAt (:loans/createdat loan)
+                        :updatedAt (:loans/updatedat loan)})
         (json-response {:error "Loan not found"} 404))))
+
 
   ;; Loan Payments
   (POST "/loans/:id/payments" {body :body {id :id} :params}
-    (println "🚀🚀 Received payment, id:" id)
     (let [payment-data (json/parse-string (slurp body) true)
           loan-id (Integer/parseInt id)
           loan-payment-id (:id payment-data)
@@ -180,14 +226,30 @@
                           :loanpayments/paymentdate payment-date}]
       (sql/update! datasource :loanPayments updated-payment {:id loan-payment-id})
       (let [loan-payment (sql/get-by-id datasource :loanPayments loan-payment-id)]
-        (json-response {:result loan-payment :message "Pagamento recebido"}))))
-
+        (json-response {:id (:loanpayments/id loan-payment)
+                        :loanId (:loanpayments/loanid loan-payment)
+                        :paidValue (:loanpayments/paidvalue loan-payment)
+                        :latePenalty (:loanpayments/latepenalty loan-payment)
+                        :paymentDate (:loanpayments/paymentdate loan-payment)
+                        :status (:loanpayments/status loan-payment)
+                        :createdAt (:loanpayments/createdat loan-payment)
+                        :updatedAt (:loanpayments/updatedat loan-payment)
+                        :dueDate (:loanpayments/duedate loan-payment)}))))
 
   (GET "/loans/:id/payments" [id]
     (let [payments (get-loan-payments (Integer/parseInt id))]
-      (json-response {:payments payments})))
+      (json-response (map #(hash-map :id (:loanpayments/id %)
+                                     :loanId (:loanpayments/loanid %)
+                                     :paidValue (:loanpayments/paidvalue %)
+                                     :latePenalty (:loanpayments/latepenalty %)
+                                     :paymentDate (:loanpayments/paymentdate %)
+                                     :status (:loanpayments/status %)
+                                     :createdAt (:loanpayments/createdat %)
+                                     :updatedAt (:loanpayments/updatedat %)
+                                     :dueDate (:loanpayments/duedate %))
+                                 payments)))))
 
 
-  (defn -main [& args]
-    (schedule-daily-payment-check)
-    (run-jetty app-routes {:port 3000 :join? false})))
+(defn -main [& m]
+  (schedule-daily-payment-check)
+  (run-jetty (handler/site app-routes) {:port 3000 :join? false}))

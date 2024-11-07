@@ -18,13 +18,14 @@ Response:
     "customerId": 123,
     "requestedValue": 10000.00,
     "termInMonths": 24,
-    "status": false,
-    "createdAt": "2024-10-10",
-    "updatedAt": "2024-10-10"
+    "status": "pending",
+    "approvedAt": null,
+    "createdAt": "2024-11-06T00:00:00Z",
+    "updatedAt": "2024-11-06T00:00:00Z"
 }
 
 
-[GET] - /loans/request
+[GET] - /loans/request?customerId=123
 
 Response:
 
@@ -34,9 +35,20 @@ Response:
         "customerId": 123,
         "requestedValue": 10000.00,
         "termInMonths": 24,
-        "status": false,
-        "createdAt": "2024-10-10",
-        "updatedAt": "2024-10-10"
+        "status": "rejected",
+        "approvedAt": null,
+        "createdAt": "2024-11-06T00:00:00Z",
+        "updatedAt": "2024-11-06T00:00:00Z"
+    },
+    {  
+        "id": 2,
+        "customerId": 123,
+        "requestedValue": 10000.00,
+        "termInMonths": 24,
+        "status": "approved",
+        "approvedAt": "2024-11-06T00:00:00Z",
+        "createdAt": "2024-11-06T00:00:00Z",
+        "updatedAt": "2024-11-06T00:00:00Z"
     }
 ]
 
@@ -46,79 +58,44 @@ Response:
 Response:
 
 {
-    "id": 1,
+    "id": 2,
     "customerId": 123,
     "requestedValue": 10000.00,
     "termInMonths": 24,
-    "status": false,
-    "approvedAt": null,
-    "createdAt": "2024-10-10",
-    "updatedAt": "2024-10-10"
+    "status": "approved",
+    "approvedAt": "2024-11-06T00:00:00Z",
+    "createdAt": "2024-11-06T00:00:00Z",
+    "updatedAt": "2024-11-06T00:00:00Z"
 }
 
 
-[PUT] - /loans/request/:id
-
-Body:
-
-{
-    "status": true,
-    "approvedAt": "2024-10-11"
-}
+[DELETE] - /loans/request/:id
 
 Response:
 
 {
-    "id": 1,
-    "status": true,
-    "approvedAt": "2024-10-11",
-    "updatedAt": "2024-10-11"
+    "message": "Loan request deleted"
 }
+
 
 
 ## Loans
 
 
-[POST] - /loans/
-
-Body:
-
-{
-    "requestId": 1,
-    "customerId": 123,
-    "approvedValue": 9500.00,
-    "interestRate": 5.5,
-    "installmentValue": 400.00
-}
-
-Response:
-
-{
-    "id": 1,
-    "requestId": 1,
-    "customerId": 123,
-    "approvedValue": 9500.00,
-    "interestRate": 5.5,
-    "installmentValue": 400.00,
-    "status": true,
-    "createdAt": "2024-10-11",
-    "updatedAt": "2024-10-11"
-}
-
-
-[GET] - /loans/
+[GET] - /loans?customerId=123
 
 Response:
 
 [
     {
         "id": 1,
+        "requestId": 2,
         "customerId": 123,
-        "approvedValue": 9500.00,
-        "installmentValue": 400.00,
-        "status": true,
-        "createdAt": "2024-10-11",
-        "updatedAt": "2024-10-11"
+        "approvedValue": 10000.00,
+        "interestRate": 14.0,
+        "installmentValue": 2007.46,
+        "createdAt": "2024-11-06T00:00:00Z",
+        "updatedAt": "2024-11-06T00:00:00Z"
     }
 ]
 
@@ -129,41 +106,19 @@ Response:
 
 {
     "id": 1,
+    "requestId": 2,
     "customerId": 123,
-    "approvedValue": 9500.00,
-    "installmentValue": 400.00,
-    "interestRate": 5.5,
-    "status": true,
-    "createdAt": "2024-10-11",
-    "updatedAt": "2024-10-11"
+    "approvedValue": 10000.00,
+    "interestRate": 14.0,
+    "installmentValue": 2007.46,
+    "createdAt": "2024-11-06T00:00:00Z",
+    "updatedAt": "2024-11-06T00:00:00Z"
 }
+
 
 
 ## Loans Payments
 
-
-[POST] - /loans/:id/payments
-
-Body:
-
-{
-    "id": 1
-}
-
-Response:
-
-{
-    "id": 1,
-    "loanId": 1,
-    "paidValue": 400.00,
-    "latePenalty": 0.00,
-    "fee": 5.00,
-    "dueDate": "2024-11-10",
-    "paymentDate": "2024-11-05",
-    "status": true,
-    "createdAt": "2024-11-05",
-    "updatedAt": "2024-11-05"
-}
 
 [GET] - /loans/:id/payments
 
@@ -173,13 +128,69 @@ Response:
     {
         "id": 1,
         "loanId": 1,
-        "paidValue": 400.00,
+        "paidValue": 2007.46,
         "latePenalty": 0.00,
-        "fee": 5.00,
-        "dueDate": "2024-11-10",
-        "paymentDate": "2024-11-05",
-        "status": true,
-        "createdAt": "2024-11-05",
-        "updatedAt": "2024-11-05"
+        "paymentDate": null,
+        "status": false,
+        "createdAt": "2024-11-05T00:00:00Z",
+        "updatedAt": "2024-11-05T00:00:00Z",
+        "dueDate": "2024-12-05T00:00:00Z"
+    },
+    {
+        "id": 2,
+        "loanId": 1,
+        "paidValue": 2007.46,
+        "latePenalty": 0.00,
+        "paymentDate": null,
+        "status": false,
+        "createdAt": "2024-11-05T00:00:00Z",
+        "updatedAt": "2024-11-05T00:00:00Z",
+        "dueDate": "2025-01-05T00:00:00Z"
+    },
+    {
+        "id": 3,
+        "loanId": 1,
+        "paidValue": 2007.46,
+        "latePenalty": 0.00,
+        "paymentDate": null,
+        "status": false,
+        "createdAt": "2024-11-05T00:00:00Z",
+        "updatedAt": "2024-11-05T00:00:00Z",
+        "dueDate": "2025-02-05T00:00:00Z"
+    },
+    ...
+    {
+        "id": 24,
+        "loanId": 1,
+        "paidValue": 2007.46,
+        "latePenalty": 0.00,
+        "paymentDate": null,
+        "status": false,
+        "createdAt": "2024-11-05T00:00:00Z",
+        "updatedAt": "2024-11-05T00:00:00Z",
+        "dueDate": "2026-11-05T00:00:00Z"
     }
 ]
+
+
+[POST] - /loans/:id/payments
+
+Body:
+
+{
+    "id": 1,
+}
+
+Response:
+
+{
+    "id": 1,
+    "loanId": 1,
+    "paidValue": 2007.46,
+    "latePenalty": 0.00,
+    "paymentDate": "2024-11-05T00:00:00Z",
+    "status": true,
+    "createdAt": "2024-11-05T00:00:00Z",
+    "updatedAt": "2024-11-05T00:00:00Z",
+    "dueDate": "2024-12-05T00:00:00Z"
+},
