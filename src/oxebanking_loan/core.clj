@@ -85,7 +85,7 @@
   (sql/insert! datasource :loanPayments payment-data))
 
 (defn get-loan-payments [loan-id]
-  (sql/query datasource ["SELECT * FROM loanPayments WHERE loanid = ?" loan-id]))
+  (sql/query datasource ["SELECT * FROM loanPayments WHERE loanid = ? ORDER BY id ASC" loan-id]))
 
 
 ;; Cria as faturas para o empréstimo de acordo com a quantidade de parcelas
@@ -147,13 +147,13 @@
           result (create-loan-request loan-data)]
       (process-loan-request result)
       (json-response {:id (:loanrequests/id result)
-                      :customerId (:loanrequests/customerid loan-data)
-                      :requestedValue (:loanrequests/requestedvalue loan-data)
-                      :termInMonths (:loanrequests/terminmonths loan-data)
-                      :status (:loanrequests/status loan-data)
-                      :approvedAt (:loanrequests/approvedat loan-data)
-                      :createdAt (:loanrequests/createdat loan-data)
-                      :updatedAt (:loanrequests/updatedat loan-data)})))
+                      :customerId (:loanrequests/customerid result)
+                      :requestedValue (:loanrequests/requestedvalue result)
+                      :termInMonths (:loanrequests/terminmonths result)
+                      :status (:loanrequests/status result)
+                      :approvedAt (:loanrequests/approvedat result)
+                      :createdAt (:loanrequests/createdat result)
+                      :updatedAt (:loanrequests/updatedat result)})))
 
   (GET "/loans/request" {params :params}
     (let [customer-id (:customerId params)
